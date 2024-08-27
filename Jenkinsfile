@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         NODE_ENV = 'production'
+        PORT = 5000 // Specify the port the server will run on
+        SERVER_URL = "http://localhost:${PORT}"
     }
 
     stages {
@@ -39,9 +41,15 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Deploy the application. This could be a custom script or command.
-                // Example of running the Node.js server:
+                // Deploy the application by starting the Node.js server
                 sh 'nohup node app.js &'
+            }
+        }
+
+        stage('Post-Deployment') {
+            steps {
+                // Print the server URL for easy access
+                echo "Application is running at ${env.SERVER_URL}"
             }
         }
     }
