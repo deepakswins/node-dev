@@ -9,22 +9,34 @@ PM2_APP_NAME="nodejs-app" # Assuming you're using PM2 to manage your Node.js app
 # Pull the latest changes from the repository
 if [ -d "$APP_DIR" ]; then
   cd $APP_DIR
+  echo "Pulling the latest changes from the $BRANCH branch..."
   git pull origin $BRANCH
 else
+  echo "Cloning the repository from $REPO_URL..."
   git clone $REPO_URL $APP_DIR
   cd $APP_DIR
   git checkout $BRANCH
 fi
 
+# Display the latest commit details
+echo "Latest commit details:"
+git log -1 --pretty=format:"%h - %s (%ci) <%an>"
+
 # Install dependencies
+echo "Installing dependencies..."
 npm install
 
 # Restart the Node.js application using PM2
 if pm2 list | grep -q $PM2_APP_NAME; then
+  echo "Restarting the PM2 app: $PM2_APP_NAME..."
   pm2 restart $PM2_APP_NAME
 else
+  echo "Starting the PM2 app: $PM2_APP_NAME..."
   pm2 start app.js --name $PM2_APP_NAME
 fi
 
 # Optional: Clean up old logs or perform other maintenance tasks
+echo "Flushing PM2 logs..."
 pm2 flush
+
+echo "Deployment script completed successfully."
