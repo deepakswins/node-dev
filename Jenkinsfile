@@ -15,6 +15,21 @@ pipeline {
             }
         }
 
+        stage('Display Git Changes') {
+            steps {
+                script {
+                    // Show the last commit hash and the changes made in the last commit
+                    def gitCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    def gitChanges = sh(script: "git log -1 --pretty=format:'%h - %s (%ci) <%an>' --abbrev-commit", returnStdout: true).trim()
+                    def gitDiff = sh(script: "git diff --name-only HEAD~1..HEAD", returnStdout: true).trim()
+                    
+                    echo "Last Commit: ${gitCommit}"
+                    echo "Changes: ${gitChanges}"
+                    echo "Files Changed:\n${gitDiff}"
+                }
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 // Install Node.js dependencies
