@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from the version control
-                git url: 'https://your-repo-url.git', branch: 'main'
+                git url: 'https://github.com/deepakswins/node-dev.git', branch: 'main'
             }
         }
 
