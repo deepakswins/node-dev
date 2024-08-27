@@ -71,7 +71,7 @@ pipeline {
                     } else {
                         // Fallback: stop any running node process and start a new one
                         sh 'pkill node || echo "No existing node process to kill"'
-                        sh 'nohup node main.js &'
+                
                     }
                 }
             }
