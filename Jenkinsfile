@@ -1,22 +1,59 @@
 pipeline {
     agent any
+
+    environment {
+        NODE_ENV = 'production'
+    }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
+                // Checkout the code from the version control
+                git url: 'https://your-repo-url.git', branch: 'main'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install Node.js dependencies
                 sh 'npm install'
             }
         }
-        stage('Test') {
+
+        stage('Run Tests') {
             steps {
-                sh './jenkins/scripts/test.sh'
+                // Run your tests here, if you have any. If not, you can skip this stage.
+                sh 'npm test'
             }
         }
-        stage('Deliver') { 
+
+        stage('Build') {
             steps {
-                sh './jenkins/scripts/deliver.sh' 
-                input message: 'Finished using the web site? (Click "Proceed" to continue)' 
-                sh './jenkins/scripts/kill.sh' 
+                // Any build steps if needed, for example, bundling your code.
+                sh 'npm run build'
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy the application. This could be a custom script or command.
+                // If deploying to a server, you might SCP files, run SSH commands, etc.
+                // Example of running the Node.js server:
+                sh 'nohup node app.js &'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up
+            sh 'rm -rf node_modules'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
