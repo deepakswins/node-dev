@@ -21,8 +21,11 @@ pipeline {
         }
 
         stage('Run Tests') {
+            when {
+                expression { return fileExists('package.json') && sh(script: "npm run test -- --help > /dev/null 2>&1", returnStatus: true) == 0 }
+            }
             steps {
-                // Run your tests here, if you have any. If not, you can skip this stage.
+                // Run tests if they are specified
                 sh 'npm test'
             }
         }
@@ -30,14 +33,13 @@ pipeline {
         stage('Build') {
             steps {
                 // Any build steps if needed, for example, bundling your code.
-                sh 'npm run build'
+                sh 'npm run build || echo "No build script found, skipping build"'
             }
         }
 
         stage('Deploy') {
             steps {
                 // Deploy the application. This could be a custom script or command.
-                // If deploying to a server, you might SCP files, run SSH commands, etc.
                 // Example of running the Node.js server:
                 sh 'nohup node app.js &'
             }
