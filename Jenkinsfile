@@ -10,6 +10,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Clean up any untracked files from the workspace before checkout
+                sh 'git clean -fdx'
+
                 // Checkout the code from the version control
                 git url: 'https://github.com/deepakswins/node-dev.git', branch: 'main'
             }
@@ -56,8 +59,21 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Deploy the application by starting the Node.js server
-                sh 'nohup node app.js &'
+                script {
+                    // If PM2 is being used to manage the Node.js application
+                    def isPm2Installed = sh(script: "pm2 -v > /dev/null 2>&1", returnStatus: true) == 0
+
+                    if (isPm2Installed) {
+                        // Stop the existing instance, if any
+                        sh "pm2 stop nodejs-app || echo 'No existing PM2 process to stop'"
+                        // Start or restart the application using PM2
+                        sh "pm2 start app.js --name nodejs-app"
+                    } else {
+                        // Fallback: stop any running node process and start a new one
+                        sh 'pkill node || echo "No existing node process to kill"'
+                        sh 'nohup node app.js &'
+                    }
+                }
             }
         }
 
