@@ -67,11 +67,11 @@ pipeline {
                         // Stop the existing instance, if any
                         sh "pm2 stop nodejs-app || echo 'No existing PM2 process to stop'"
                         // Start or restart the application using PM2
-                        sh "pm2 start app.js --name nodejs-app"
+                        sh "pm2 start main.js --name nodejs-app"
                     } else {
                         // Fallback: stop any running node process and start a new one
                         sh 'pkill node || echo "No existing node process to kill"'
-                        sh 'nohup node app.js &'
+                        sh 'nohup node main.js &'
                     }
                 }
             }
