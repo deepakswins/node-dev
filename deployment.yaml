@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Set variables
+REPO_URL="https://github.com/deepakswins/node-dev.git"
+APP_DIR="/var/www/nodejs-app"
+BRANCH="main"
+PM2_APP_NAME="nodejs-app" # Assuming you're using PM2 to manage your Node.js app
+
+# Pull the latest changes from the repository
+if [ -d "$APP_DIR" ]; then
+  cd $APP_DIR
+  git pull origin $BRANCH
+else
+  git clone $REPO_URL $APP_DIR
+  cd $APP_DIR
+  git checkout $BRANCH
+fi
+
+# Install dependencies
+npm install
+
+# Restart the Node.js application using PM2
+if pm2 list | grep -q $PM2_APP_NAME; then
+  pm2 restart $PM2_APP_NAME
+else
+  pm2 start app.js --name $PM2_APP_NAME
+fi
+
+# Optional: Clean up old logs or perform other maintenance tasks
+pm2 flush
